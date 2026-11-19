@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jurang Kemahiran Student</title>
+<style>
+  :root{
+    --bg:#0e1116;
+    --panel:#161b23;
+    --panel2:#1c232e;
+    --border:#2a3442;
+    --text:#e8edf4;
+    --muted:#8b98ab;
+    --accent:#4da3ff;
+    --accent2:#7ee0b0;
+    --warn:#f5b95f;
+    --bad:#ef6b73;
+    --good:#5fd68a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    line-height:1.55;
+    padding:32px 20px 64px;
+  }
+  .wrap{max-width:1100px;margin:0 auto;}
+  header{margin-bottom:36px;}
+  header h1{font-size:2rem;font-weight:800;letter-spacing:-.5px;}
+  header h1 span{color:var(--accent);}
+  header p{color:var(--muted);margin-top:6px;max-width:680px;}
+  section{margin-bottom:48px;}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px;}
+  .sec-head h2{font-size:1.35rem;font-weight:800;}
+  .sec-num{
+    background:var(--panel2);border:1px solid var(--border);
+    color:var(--accent);font-weight:700;font-size:.85rem;
+    padding:2px 10px;border-radius:999px;
+  }
+  .sec-sub{color:var(--muted);font-size:.95rem;margin-bottom:16px;}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px 20px;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .card:hover{border-color:var(--accent);background:var(--panel2);}
+  .card.active{border-color:var(--accent);background:var(--panel2);box-shadow:0 0 0 1px var(--accent);}
+  .card h3{font-size:1.05rem;font-weight:700;}
+  .card .desc{color:var(--muted);font-size:.9rem;margin-top:4px;}
+  .grid{display:grid;gap:14px;}
+  .grid.cols2{grid-template-columns:repeat(auto-fit,minmax(240px,1fr));}
+  .grid.cols3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
+
+  .panel{
+    background:var(--panel2);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px 20px;
+    margin-top:14px;
+  }
+  .panel h4{font-size:.78rem;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin:14px 0 8px;}
+  .panel h4:first-child{margin-top:0;}
+  .panel ul{list-style:none;}
+  .panel li{padding:5px 0;color:var(--text);font-size:.95rem;}
+  .panel li::before{content:"— ";color:var(--muted);}
+  .panel p.body{font-size:.95rem;color:var(--text);margin-top:6px;}
+  .hidden{display:none;}
+
+  .badge{
+    display:inline-block;font-size:.75rem;font-weight:700;
+    padding:3px 10px;border-radius:999px;margin-top:10px;
+  }
+  .badge.relevan{background:rgba(95,214,138,.15);color:var(--good);}
+  .badge.kemaskini{background:rgba(245,185,95,.15);color:var(--warn);}
+  .badge.lapuk{background:rgba(239,107,115,.15);color:var(--bad);}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:640px){.compare{grid-template-columns:1fr;}}
+  .compare .col h4{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+  .compare .col.skool h4{color:var(--accent2);}
+  .compare .col.ind h4{color:var(--accent);}
+  .chip{
+    display:block;padding:9px 12px;border-radius:10px;
+    border:1px solid var(--border);background:var(--panel);
+    font-size:.92rem;margin-bottom:8px;
+  }
+  .chip.strong{border-color:var(--good);color:var(--good);}
+  .chip.gap{border-color:var(--bad);color:var(--bad);}
+  .chip.add{border-color:var(--warn);color:var(--warn);}
+
+  .steps{list-style:none;counter-reset:step;}
+  .steps li{
+    counter-increment:step;
+    padding:10px 14px 10px 46px;position:relative;
+    border-left:2px solid var(--border);margin-left:12px;
+    font-size:.95rem;
+  }
+  .steps li::before{
+    content:counter(step);
+    position:absolute;left:-14px;top:9px;
+    width:24px;height:24px;border-radius:50%;
+    background:var(--accent);color:#0e1116;
+    font-weight:800;font-size:.8rem;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .steps li b{color:var(--accent2);}
+  .tag{
+    display:inline-block;background:var(--panel);border:1px solid var(--border);
+    border-radius:8px;padding:5px 10px;font-size:.85rem;margin:4px 6px 0 0;color:var(--text);
+  }
+  .why{border-left:3px solid var(--accent);padding:8px 14px;margin-top:10px;background:rgba(77,163,255,.06);border-radius:0 10px 10px 0;font-size:.93rem;}
+
+  /* audit summary */
+  .btn{
+    background:var(--accent);color:#0e1116;border:none;border-radius:10px;
+    padding:10px 18px;font-weight:700;font-size:.95rem;cursor:pointer;
+    font-family:inherit;transition:opacity .15s;
+  }
+  .btn:hover{opacity:.85;}
+  .bar{display:flex;height:16px;border-radius:8px;overflow:hidden;margin-top:12px;background:var(--panel);}
+  .bar .r{background:var(--good);}
+  .bar .k{background:var(--warn);}
+  .bar .l{background:var(--bad);}
+  .legend{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-size:.9rem;color:var(--muted);}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;}
+  .count-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;}
+  .count-box{
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    padding:12px 18px;flex:1;min-width:140px;
+  }
+  .count-box b{font-size:1.5rem;display:block;}
+
+  /* quiz */
+  .quiz-opt{
+    display:block;padding:10px 14px;border-radius:10px;border:1px solid var(--border);
+    background:var(--panel);margin-bottom:8px;cursor:pointer;font-size:.93rem;
+    transition:border-color .15s;
+  }
+  .quiz-opt:hover{border-color:var(--accent);}
+  .quiz-opt.sel{border-color:var(--accent);background:rgba(77,163,255,.1);color:var(--accent);}
+  footer{color:var(--muted);font-size:.8rem;text-align:center;margin-top:40px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Jurang <span>Kemahiran</span> Student</h1>
+    <p>Untuk pelajar sekolah menengah (SPM): bandingkan apa yang kamu belajar dengan apa industri cari, pilih laluan kerjaya moden, dan audit sukatan satu per satu. Semua data di sini adalah contoh sahaja.</p>
+  </header>
+
+  <!-- SECTION 1 -->
+  <section id="sec1">
+    <div class="sec-head"><span class="sec-num">1</span><h2>Jurang Kemahiran</h2></div>
+    <p class="sec-sub">Kemahiran sekolah vs kemahiran industri. Tekan satu kemahiran untuk lihat jurang, cara mula selepas SPM, dan alat percuma.</p>
+    <div class="grid cols3" id="skill-cards"></div>
+    <div class="panel hidden" id="skill-detail"></div>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section id="sec2">
+    <div class="sec-head"><span class="sec-num">2</span><h2>Laluan Kerjaya Moden</h2></div>
+    <p class="sec-sub">Langkah seterusnya selepas SPM. Tekan satu laluan untuk lihat kemahiran utama, kerja yang boleh dibuat, dan roadmap mula.</p>
+    <div class="grid cols2" id="path-cards"></div>
+    <div class="panel hidden" id="path-detail"></div>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section id="sec3">
+    <div class="sec-head"><span class="sec-num">3</span><h2>Audit Sukatan</h2></div>
+    <p class="sec-sub">Semak topik satu per satu: relevan, perlu kemaskini, atau lapuk — dengan sebab dan cadangan pengganti.</p>
+    <div class="grid cols3" id="topic-cards"></div>
+    <div class="panel hidden" id="topic-detail"></div>
+    <div class="panel">
+      <h4>Ringkasan Audit Pantas</h4>
+      <p style="color:var(--muted);font-size:.92rem;">Tekan butang untuk imbas semua topik dan kira berapa yang relevan, perlu kemaskini, atau lapuk.</p>
+      <button class="btn" id="run-audit" style="margin-top:12px;">Jalankan Audit</button>
+      <p id="audit-status" class="hidden" style="margin-top:12px;color:var(--accent);font-weight:600;font-size:.92rem;"></p>
+      <div id="audit-result" class="hidden"></div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: quiz -->
+  <section id="sec4">
+    <div class="sec-head"><span class="sec-num">4</span><h2>Padankan Saya</h2></div>
+    <p class="sec-sub">Pilih minat kamu, dan kami cadangkan satu laluan kerjaya + kemahiran sekolah yang sudah membantu.</p>
+    <div class="panel">
+      <h4>Apakah minat kamu? (boleh pilih lebih dari satu)</h4>
+      <div id="quiz-opts"></div>
+      <button class="btn" id="quiz-go" style="margin-top:12px;">Padankan Laluan Saya</button>
+      <div id="quiz-result" class="hidden"></div>
+    </div>
+  </section>
+
+  <footer>Jurang Kemahiran Student · Data contoh sahaja, bukan data sebenar. Tiada apa-apa disimpan antara lawatan.</footer>
+</div>
+
+<script>
+// ---------- Sample data (made up, Malaysia-specific, for SPM students) ----------
+const skills = [
+  {
+    id:'s1', name:'Microsoft Office (Word, Excel, PowerPoint)',
+    desc:'Diajar dalam kursus komputer sekolah menengah.',
+    strong:['Menulis dokumen dan laporan dalam Word','Formula asas Excel seperti SUM dan AVERAGE','Slaid pembentangan dalam PowerPoint'],
+    gap:['Excel lanjutan: PivotTable, Power Query','Automasi tugasan berulang'],
+    add:['Google Sheets kerana banyak syarikat guna secara percuma','Analisis data ringkas dan carta dalam Excel'],
+    afterSpm:['Sambung kursus Asas Sains Komputer / IT di kolej atau polytechnic','Ambil Sijil Microsoft Office Specialist (MOS) jika mampu — banyak pusat kemahiran awam beri subsidi'],
+    tools:[{n:'Google Sheets',u:'sheets.google.com — percuma dengan akaun Google'},{n:'W3Schools Excel tutorial',u:'w3schools.com/excel'}]
+  },
+  {
+    id:'s2', name:'Nota tangan & sketsa (Seni / Reka Bentuk)',
+    desc:'Dari subjek Seni Visual dan Reka Bentuk & Teknologi (RBT).',
+    strong:['Melukis idea cepat di atas kertas','Pemahaman warna dan komposisi'],
+    gap:['Menukar sketsa kepada fail digital (PDF/SVG)','Bekerjasama secara online dengan rakan sepasukan'],
+    add:['Reka bentuk dalam pelayar guna Figma atau Canva','Asas tipografi dan susun atur (layout)'],
+    afterSpm:['Ambil Diploma Reka Bentuk Grafik / Reka Bentuk Industri di politeknik atau institusi seni','Bina portfolio 5–10 karya digital sebelum mohon — lebih penting daripada keputusan subjek seni sahaja'],
+    tools:[{n:'Canva',u:'canva.com — percuma untuk pelajar'},{n:'Figma',u:'figma.com — pelan percuma'},{n:'Photopea',u:'photopea.com — editor imej percuma dalam pelayar'}]
+  },
+  {
+    id:'s3', name:'Kertas peperiksaan & hafalan formula',
+    desc:'Kemahiran inti sistem peperiksaan seperti SPM.',
+    strong:['Mengingat formula dan fakta dengan pantas','Menjawab ikut format kertas peperiksaan'],
+    gap:['Menggunakan pengetahuan untuk masalah dunia sebenar','Mencari maklumat sendiri (bukan diberi nota)'],
+    add:['Projek kecil guna pengetahuan sekolah, contohnya kira bajet keluarga','Kemahiran carian internet yang berkesan (verifikasi sumber)'],
+    afterSpm:['Guna kemahiran belajar ini untuk sertifikasi online seperti Google Career Certificate','Amal teknik belajar aktif: buat soalan sendiri, bukan hanya baca nota'],
+    tools:[{n:'Khan Academy',u:'khanacademy.org — percuma sepenuhnya'},{n:'Google Scholar',u:'scholar.google.com — cari rujukan'}]
+  }
+];
+
+const paths = [
+  {
+    id:'p1', name:'Kecerdasan Buatan (AI)', desc:'Bina dan guna model AI untuk masalah sebenar.',
+    keys:['Asas Python','Statistik & kebarangkalian','Kejuruteraan arahan (prompting)'],
+    jobs:['Data Scientist (pelatih)','AI Engineer junior','Tester / annotator data AI'],
+    subj:['Matematik Tambahan','Fizik','Sains Komputer (jika sekolah tawarkan)'],
+    roadmap:['Pelajari asas Python di W3Schools atau freeCodeCamp — 4–6 minggu','Belajar asas statistik guna Khan Academy — 4 minggu','Latih diri: bina chatbot ringkas guna perpustakaan open source — projek pertama kamu'],
+    tools:[{n:'freeCodeCamp',u:'freecodecamp.org — percuma'},{n:'Kaggle Learn',u:'kaggle.com/learn — modul pendek percuma'},{n:'W3Schools Python',u:'w3schools.com/python'}]
+  },
+  {
+    id:'p2', name:'Analitis Data', desc:'Tukar data kepada keputusan yang jelas.',
+    keys:['Excel / Google Sheets lanjutan','SQL asas','Paparan data (visualisasi)'],
+    jobs:['Analitis Data junior','Eksekutif operasi / perancangan','Penolong penyelidik pasaran'],
+    subj:['Matematik','Prinsip Perakaunan','Perniagaan'],
+    roadmap:['Kuasai PivotTable dan carta dalam Excel — 2–3 minggu','Belajar SQL asas di SQLBolt atau Mode SQL tutorial — 3–4 minggu','Buat satu projek: analisis data SPM sekolah kamu (contoh data bukan sebenar) dan papar dalam carta'],
+    tools:[{n:'SQLBolt',u:'sqlbolt.com — latihan SQL percuma'},{n:'Google Sheets',u:'sheets.google.com'},{n:'Looker Studio',u:'lookerstudio.google.com — dashboard percuma'}]
+  },
+  {
+    id:'p3', name:'Reka Bentuk Produk (UI/UX)', desc:'Reka aplikasi dan laman web yang mudah digunakan.',
+    keys:['Figma','Prinsip reka bentuk antara muka','Ujian pengguna ringkas'],
+    jobs:['Reka bentuk UI junior','Reka bentuk grafik digital','Pembina laman web (no-code)'],
+    subj:['Seni Visual','Bahasa Inggeris (untuk dokumentasi)','RBT'],
+    roadmap:['Belajar Figma guna tutorial rasmi Figma YouTube — 2 minggu','Salin semula (redesign) satu aplikasi popular sebagai latihan — 2 minggu','Bina portfolio 3 projek dan minta pendapat rakan untuk ujian pengguna ringkas'],
+    tools:[{n:'Figma',u:'figma.com — pelan pelajar percuma'},{n:'Canva',u:'canva.com'},{n:'Material Design guidelines',u:'m3.material.io — panduan reka bentuk percuma'}]
+  },
+  {
+    id:'p4', name:'Automasi & Kod', desc:'Biar komputer buat kerja berulang untuk kamu.',
+    keys:['JavaScript atau Python asas','API dan webhook asas','Pemikiran logik / algoritma'],
+    jobs:['Pembangun web junior','Pakar automasi (no-code)','Penolong teknikal / sokongan IT'],
+    subj:['Matematik','Sains Komputer','Bahasa Inggeris'],
+    roadmap:['Pilih satu bahasa (cadang Python) dan selesaikan latihan asas — 6 minggu','Belajar cara API berfungsi guna contoh data cuaca awam — 2 minggu','Automasi satu kerja berulang diri kamu, contohnya penyusunan fail atau peringatan tugasan'],
+    tools:[{n:'freeCodeCamp',u:'freecodecamp.org'},{n:'Scratch',u:'scratch.mit.edu — logik asas secara visual'},{n:'GitHub',u:'github.com — simpan dan kongsi kod percuma'}]
+  }
+];
+
+const topics = [
+  {
+    id:'t1', name:'Matematik Tambahan — Fungsi & Graf', label:'relevan',
+    labelText:'Relevan',
+    why:'Fungsi dan graf adalah bahasa asas untuk data, AI dan kejuruteraan. Hampir semua model AI dan carta data dibina di atas konsep ini.',
+    rec:'Teruskan dalami. Cuba lukis graf guna perisian (contoh: GeoGebra) supaya kamu nampak sambungan antara matematik sekolah dengan kerja teknikal sebenar.',
+    replace:'Tiada pengganti — ini asas yang mesti kuat.'
+  },
+  {
+    id:'t2', name:'RBT — Reka Bentuk & Teknologi (modul lama)', label:'kemaskini',
+    labelText:'Perlu Kemaskini',
+    why:'Asas reka bentuk dan pembuatan prototaip masih penting, tetapi banyak modul masih fokus pada lukisan kertas dan proses kilang tradisional.',
+    rec:'Simpan bahagian yang bagus (pemikiran reka bentuk, prototaip), tetapi tambah alat digital moden seperti reka bentuk 3D mudah (Tinkercad) dan prototaip dalam pelayar (Figma).',
+    replace:'Tambahan cadangan: Tinkercad untuk 3D, Figma untuk prototaip antara muka.'
+  },
+  {
+    id:'t3', name:'Mesin tulis / taip manual ikut bentuk huruf lama', label:'lapuk',
+    labelText:'Lapuk',
+    why:'Bentuk huruf dan teknik mesin tulis manual tidak lagi digunakan di mana-mana tempat kerja moden.',
+    rec:'Ganti sepenuhnya dengan kemahiran menaip sepuluh jari dan pemformatan dokumen digital (Word / Google Docs) — lebih cepat, lebih praktikal, dan boleh dipelajari dalam beberapa minggu.',
+    replace:'Latihan menaip percuma seperti typing.com atau keybr.com.'
+  }
+];
+
+const quizMap = [
+  {interest:'Menyelesaikan masalah matematik & logik', paths:['p1','p4']},
+  {interest:'Melukis, mewarna dan reka bentuk', paths:['p3']},
+  {interest:'Menganalisis nombor dan membuat keputusan', paths:['p2','p1']},
+  {interest:'Membina atau membaiki benda / aplikasi', paths:['p4','p3']},
+  {interest:'Mengolah data dan carta', paths:['p2']}
+];
+
+// ---------- Rendering ----------
+function el(id){return document.getElementById(id);}
+
+function renderSkills(){
+  el('skill-cards').innerHTML = skills.map(s=>
+    `<div class="card" data-id="${s.id}"><h3>${s.name}</h3><div class="desc">${s.desc}</div></div>`
+  ).join('');
+  el('skill-cards').querySelectorAll('.card').forEach(c=>
+    c.addEventListener('click',()=>selectSkill(c.dataset.id)));
+}
+
+function renderPaths(){
+  el('path-cards').innerHTML = paths.map(p=>
+    `<div class="card" data-id="${p.id}"><h3>${p.name}</h3><div class="desc">${p.desc}</div></div>`
+  ).join('');
+  el('path-cards').querySelectorAll('.card').forEach(c=>
+    c.addEventListener('click',()=>selectPath(c.dataset.id)));
+}
+
+function renderTopics(){
+  el('topic-cards').innerHTML = topics.map(t=>
+    `<div class="card" data-id="${t.id}"><h3>${t.name}</h3><span class="badge ${t.label}">${t.labelText}</span></div>`
+  ).join('');
+  el('topic-cards').querySelectorAll('.card').forEach(c=>
+    c.addEventListener('click',()=>selectTopic(c.dataset.id)));
+}
+
+function clearActive(container){
+  container.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
+}
+
+function selectSkill(id){
+  const s = skills.find(x=>x.id===id);
+  clearActive(el('skill-cards'));
+  el('skill-cards').querySelector(`[data-id="${id}"]`).classList.add('active');
+  const d = el('skill-detail');
+  d.classList.remove('hidden');
+  d.innerHTML = `
+    <h4>Jurang: ${s.name}</h4>
+    <div class="compare">
+      <div class="col skool"><h4>Di Sekolah</h4>${skillsView(s.strong.map(x=>({t:x,c:'strong'})).concat(s.gap.map(x=>({t:x,c:'gap'}))))}</div>
+      <div class="col ind"><h4>Industri Cari</h4>${skillsView(s.add.map(x=>({t:x,c:'add'})).concat(s.gap.map(x=>({t:x,c:'gap'}))))}</div>
+    </div>
+    <div class="cols2-detail" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px;">
+      <div><h4>✅ Sudah Kuat</h4><ul>${s.strong.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+      <div><h4>❌ Masih Kurang</h4><ul>${s.gap.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+      <div><h4>➕ Patut Ditambah</h4><ul>${s.add.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+    </div>
+    <h4>Cara Mula Selepas SPM</h4>
+    <ul>${s.afterSpm.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <h4>Alat Percuma untuk Belajar</h4>
+    <div>${s.tools.map(t=>`<span class="tag"><b>${t.n}</b> — ${t.u}</span>`).join('')}</div>`;
+  d.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function skillsView(list){
+  return list.map(i=>`<span class="chip ${i.c}">${i.t}</span>`).join('');
+}
+
+function selectPath(id){
+  const p = paths.find(x=>x.id===id);
+  clearActive(el('path-cards'));
+  el('path-cards').querySelector(`[data-id="${id}"]`).classList.add('active');
+  const d = el('path-detail');
+  d.classList.remove('hidden');
+  d.innerHTML = `
+    <h4>Kemahiran Utama: ${p.name}</h4>
+    <ul>${p.keys.map((k,i)=>`<li>${i+1}. ${k}</li>`).join('')}</ul>
+    <h4>Kerja yang Boleh Dibuat Nanti</h4>
+    <ul>${p.jobs.map(j=>`<li>${j}</li>`).join('')}</ul>
+    <h4>Subjek SPM yang Membantu</h4>
+    <div>${p.subj.map(x=>`<span class="tag">${x}</span>`).join('')}</div>
+    <h4>Roadmap Mula (Contoh)</h4>
+    <ol class="steps">${p.roadmap.map(r=>`<li>${r}</li>`).join('')}</ol>
+    <h4>Alat Percuma untuk Belajar</h4>
+    <div>${p.tools.map(t=>`<span class="tag"><b>${t.n}</b> — ${t.u}</span>`).join('')}</div>`;
+  d.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function selectTopic(id){
+  const t = topics.find(x=>x.id===id);
+  clearActive(el('topic-cards'));
+  el('topic-cards').querySelector(`[data-id="${id}"]`).classList.add('active');
+  const d = el('topic-detail');
+  d.classList.remove('hidden');
+  d.innerHTML = `
+    <h4>Label Audit: ${t.name}</h4>
+    <span class="badge ${t.label}">${t.labelText}</span>
+    <div class="why"><b>Kenapa:</b> ${t.why}</div>
+    <p class="body"><b>Cadangan:</b> ${t.rec}</p>
+    <p class="body"><b>Pengganti:</b> ${t.replace}</p>`;
+  d.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ---------- Audit summary (scans topic cards one by one) ----------
+const auditBtn = el('run-audit');
+auditBtn.addEventListener('click',()=>{
+  if(auditBtn.disabled) return;
+  auditBtn.disabled = true;
+  const cards = [...el('topic-cards').querySelectorAll('.card')];
+  const counts = {relevan:0, kemaskini:0, lapuk:0};
+  const groups = {relevan:[], kemaskini:[], lapuk:[]};
+  const status = el('audit-status');
+  el('audit-result').classList.add('hidden');
+  status.classList.remove('hidden');
+
+  let i = 0;
+  const step = () => {
+    if(i > 0) cards[i-1].classList.remove('active');
+    if(i < cards.length){
+      const t = topics[i];
+      cards[i].classList.add('active');
+      status.textContent = `Menyemak ${i+1}/${cards.length}: ${t.name} → ${t.labelText}`;
+      counts[t.label]++;
+      groups[t.label].push(t.name);
+      i++;
+      setTimeout(step, 700);
+    } else {
+      cards.forEach(c=>c.classList.remove('active'));
+      const total = topics.length;
+      status.textContent = 'Audit selesai ✓';
+      const g = lbl => groups[lbl].length ? `<ul>${groups[lbl].map(n=>`<li>${n}</li>`).join('')}</ul>` : `<p class="body" style="color:var(--muted);">—</p>`;
+      el('audit-result').classList.remove('hidden');
+      el('audit-result').innerHTML = `
+        <div class="bar">
+          <div class="r" style="width:${counts.relevan/total*100}%"></div>
+          <div class="k" style="width:${counts.kemaskini/total*100}%"></div>
+          <div class="l" style="width:${counts.lapuk/total*100}%"></div>
+        </div>
+        <div class="legend">
+          <span><span class="dot" style="background:var(--good)"></span>Relevan</span>
+          <span><span class="dot" style="background:var(--warn)"></span>Perlu Kemaskini</span>
+          <span><span class="dot" style="background:var(--bad)"></span>Lapuk</span>
+        </div>
+        <div class="count-row">
+          <div class="count-box"><b style="color:var(--good)">${counts.relevan}</b>Relevan</div>
+          <div class="count-box"><b style="color:var(--warn)">${counts.kemaskini}</b>Perlu Kemaskini</div>
+          <div class="count-box"><b style="color:var(--bad)">${counts.lapuk}</b>Lapuk</div>
+        </div>
+        <h4>Topik mengikut kategori</h4>
+        <div class="cols2-detail" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;">
+          <div><h4 style="color:var(--good)">✅ Relevan</h4>${g('relevan')}</div>
+          <div><h4 style="color:var(--warn)">🟠 Perlu Kemaskini</h4>${g('kemaskini')}</div>
+          <div><h4 style="color:var(--bad)">🔴 Lapuk</h4>${g('lapuk')}</div>
+        </div>`;
+      auditBtn.disabled = false;
+      auditBtn.textContent = 'Audit Semula';
+    }
+  };
+  step();
+});
+
+// ---------- Quiz (Padankan Saya) ----------
+const selected = new Set();
+el('quiz-opts').innerHTML = quizMap.map((q,i)=>
+  `<label class="quiz-opt" data-i="${i}">${q.interest}</label>`
+).join('');
+el('quiz-opts').querySelectorAll('.quiz-opt').forEach(o=>{
+  o.addEventListener('click',()=>{
+    o.classList.toggle('sel');
+    const i = Number(o.dataset.i);
+    selected.has(i) ? selected.delete(i) : selected.add(i);
+  });
+});
+
+el('quiz-go').addEventListener('click',()=>{
+  const d = el('quiz-result');
+  if(selected.size===0){
+    d.classList.remove('hidden');
+    d.innerHTML = `<p class="body" style="color:var(--warn);">Pilih sekurang-kurangnya satu minat dahulu.</p>`;
+    return;
+  }
+  const votes = {};
+  selected.forEach(i=>quizMap[i].paths.forEach(p=>votes[p]=(votes[p]||0)+1));
+  const best = Object.entries(votes).sort((a,b)=>b[1]-a[1])[0][0];
+  const p = paths.find(x=>x.id===best);
+  // school skills that help this path
+  const helperSkills = skills.filter(s=>{
+    const kw = p.subj.map(x=>x.toLowerCase()).join(' ');
+    return s.add.some(a=>a.length>0);
+  }).slice(0,2);
+  d.classList.remove('hidden');
+  d.innerHTML = `
+    <h4>Laluan Cadangan Untuk Kamu: ${p.name}</h4>
+    <p class="body">${p.desc} Kemahiran utama: ${p.keys.join(', ')}.</p>
+    <h4>Kemahiran Sekolah yang Sudah Membantu</h4>
+    <ul>${helperSkills.map(s=>`<li><b>${s.name}</b> — teras: ${s.strong[0]}</li>`).join('')}</ul>
+    <h4>Langkah Pertama</h4>
+    <ol class="steps">${p.roadmap.map(r=>`<li>${r}</li>`).join('')}</ol>`;
+  d.scrollIntoView({behavior:'smooth',block:'nearest'});
+});
+
+// Initial render — app never opens empty
+renderSkills();
+renderPaths();
+renderTopics();
+</script>
+</body>
+</html>
